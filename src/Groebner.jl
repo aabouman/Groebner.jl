@@ -8,7 +8,7 @@ F4TIME = 0.0
 RECTIME = 0.0
 CORRTIME = 0.0
 
-ADD_ROW_HIT  = 0
+ADD_ROW_HIT = 0
 ADD_ROW_MISS = 0
 ADD_ROW_COLLISION = 0
 
@@ -21,11 +21,11 @@ function printhash()
     println("ADD_ROW_MISS = $(ADD_ROW_MISS)")
     println("ADD_ROW_COLLISION = $(ADD_ROW_COLLISION)")
 
-    ADD_ROW_HIT  = 0
+    ADD_ROW_HIT = 0
     ADD_ROW_MISS = 0
     ADD_ROW_COLLISION = 0
 end
-ADD_ROW_HIT  = 0
+ADD_ROW_HIT = 0
 ADD_ROW_MISS = 0
 
 function printall()
@@ -50,17 +50,17 @@ end
 import AbstractAlgebra
 import AbstractAlgebra.Generic: MPoly, GFElem, MPolyRing, Poly
 import AbstractAlgebra: leading_term, QQ, PolynomialRing, terms,
-                        coeff, divides, base_ring, elem_type,
-                        rref, isconstant, leading_coefficient,
-                        map_coefficients, monomials, degree,
-                        degrees, isconstant, leading_monomial,
-                        GF, gens, MatrixSpace, coefficients,
-                        crt, ordering, exponent_vectors, lift,
-                        MPolyBuildCtx, finish, push_term!, ZZ,
-                        content, change_base_ring, exponent_vector,
-                        lcm, monomial, RingElem, set_exponent_vector!,
-                        nvars, data, characteristic, isdivisible_by,
-                        divexact, symbols
+    coeff, divides, base_ring, elem_type,
+    rref, isconstant, leading_coefficient,
+    map_coefficients, monomials, degree,
+    degrees, isconstant, leading_monomial,
+    GF, gens, MatrixSpace, coefficients,
+    crt, ordering, exponent_vectors, lift,
+    MPolyBuildCtx, finish, push_term!, ZZ,
+    content, change_base_ring, exponent_vector,
+    lcm, monomial, RingElem, set_exponent_vector!,
+    nvars, data, characteristic, isdivisible_by,
+    divexact, symbols
 
 # for example systems
 import Combinatorics
