@@ -77,8 +77,8 @@ import MultivariatePolynomials: AbstractPolynomial, AbstractPolynomialLike
 # type aliases for internal objects
 include("internaltypes.jl")
 
-# some simple reference implementations
-include("reference.jl")
+# # some simple reference implementations
+# include("reference.jl")
 
 # computation parameters control
 include("metainfo.jl")
@@ -95,10 +95,11 @@ include("arithmetic/modular.jl")
 
 #= generic f4 implementation =#
 #= the heart of this library =#
-include("f4/hashtable.jl")
-include("f4/basis.jl")
-include("f4/matrix.jl")
+# include("f4/hashtable.jl")
+# include("f4/basis.jl")
+# include("f4/matrix.jl")
 
+include("f4/structs.jl")
 include("f4/symbolic.jl")
 include("f4/hash.jl")
 include("f4/linear.jl")

@@ -80,7 +80,7 @@ function groebner(
     assure_ordering!(ring, exps, coeffs, metainfo)
 
     #= compute the groebner basis =#
-    if metainfo.ground === :ff
+    if ring.ch != 0
         # if finite field #
         bexps, bcoeffs = groebner_ff(ring, exps, coeffs, reduced, metainfo)
     else

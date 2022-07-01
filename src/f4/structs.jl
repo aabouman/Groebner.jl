@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------
 ####### Hashtable ######
 
-# TODO: make immutable
+# TODO(bouman): make immutable
 #=
     stores hash of a monomial,
     corresponding divmask to speed up divisibility checks,
@@ -25,6 +25,8 @@ mutable struct Hashvalue
     deg::Int
 end
 
+
+# TODO(bouman): How does this has work
 function copy_hashvalue(x::Hashvalue)
     Hashvalue(x.hash, x.divmask, x.idx, x.deg)
 end
@@ -77,19 +79,19 @@ end
 #------------------------------------------------------------------------------
 
 function hashnextindex(h::UInt32, j::UInt32, mod::UInt32)
-     (h + j) & mod + UInt32(1)
+    (h + j) & mod + UInt32(1)
 end
 
 #------------------------------------------------------------------------------
 
 # initialize and set fields for basis hashtable
 function initialize_basis_hash_table(
-        ring::PolyRing,
-        rng::Random.AbstractRNG;
-        initial_size::Int=2^16)
+    ring::PolyRing,
+    rng::Random.AbstractRNG;
+    initial_size::Int=2^16)
 
     exponents = Vector{Vector{UInt16}}(undef, initial_size)
-    hashdata  = Vector{Hashvalue}(undef, initial_size)
+    hashdata = Vector{Hashvalue}(undef, initial_size)
     hashtable = zeros(Int, initial_size)
 
     nvars = ring.nvars
@@ -115,16 +117,16 @@ function initialize_basis_hash_table(
     offset = 2
 
     # initialize fast divisibility params
-    charbit    = 8 # TODO ??
-    int32bits  = charbit * sizeof(Int32)
+    charbit = 8 # TODO ??
+    int32bits = charbit * sizeof(Int32)
     int32bits != 32 && error("Strange story with ints")
-    ndivbits   = div(int32bits, nvars)
+    ndivbits = div(int32bits, nvars)
     # division mask stores at least 1 bit
     # per each of first charbit*sizeof(Int32) variables
     ndivbits == 0 && (ndivbits += 1)
     ndivvars = nvars < int32bits ? nvars : int32bits
-    divvars  = Vector{Int}(undef, ndivvars)
-    divmap   = Vector{UInt32}(undef, ndivvars * ndivbits)
+    divvars = Vector{Int}(undef, ndivvars)
+    divmap = Vector{UInt32}(undef, ndivvars * ndivbits)
     # count only first ndivvars variables for divisibility checks
     for i in 1:ndivvars
         divvars[i] = i
@@ -171,17 +173,17 @@ function initialize_secondary_hash_table(basis_ht::MonomialHashtable)
     initial_size = 2^6
 
     exponents = Vector{Vector{UInt16}}(undef, initial_size)
-    hashdata  = Vector{Hashvalue}(undef, initial_size)
+    hashdata = Vector{Hashvalue}(undef, initial_size)
     hashtable = zeros(Int, initial_size)
 
     # preserve ring info
     explen = basis_ht.explen
-    nvars  = basis_ht.nvars
-    ord    = basis_ht.ord
+    nvars = basis_ht.nvars
+    ord = basis_ht.ord
 
     # preserve division info
-    divmap   = basis_ht.divmap
-    divvars  = basis_ht.divvars
+    divmap = basis_ht.divmap
+    divvars = basis_ht.divvars
     ndivvars = basis_ht.ndivvars
     ndivbits = basis_ht.ndivbits
 
@@ -222,7 +224,7 @@ end
 # and rehashes all elements
 function enlarge_hash_table!(ht::MonomialHashtable)
     ht.size *= 2
-    resize!(ht.hashdata,  ht.size)
+    resize!(ht.hashdata, ht.size)
     resize!(ht.exponents, ht.size)
 
     ht.hashtable = zeros(Int, ht.size)
@@ -239,6 +241,8 @@ function enlarge_hash_table!(ht::MonomialHashtable)
             break
         end
     end
+    # TODO(bouman): remove this
+    @warn "Doubled size of Hashtable to $(ht.size)"
 end
 
 #------------------------------------------------------------------------------
@@ -263,6 +267,7 @@ mutable struct Pairset
     load::Int
 end
 
+# TODO(bouman): understand each function
 function initialize_pairset(; initial_size=2^6) # TODO: why 64?
     pairs = Vector{SPair}(undef, initial_size)
     return Pairset(pairs, 0)
@@ -329,16 +334,16 @@ function initialize_basis(ring::PolyRing, ngens::Int, ::Type{T}) where {T<:Coeff
         length(gens) == length(coeffs) == length(isred) == size
     =#
 
-    sz     = ngens * 2 # hmmm
-    ndone  = 0
+    sz = ngens * 2 # hmmm
+    ndone = 0
     ntotal = 0
-    nlead  = 0
+    nlead = 0
 
-    gens   = Vector{Vector{Int}}(undef, sz)
+    gens = Vector{Vector{Int}}(undef, sz)
     coeffs = Vector{Vector{T}}(undef, sz)
-    isred  = zeros(Int8, sz)
+    isred = zeros(Int8, sz)
     nonred = Vector{Int}(undef, sz)
-    lead   = Vector{UInt32}(undef, sz)
+    lead = Vector{UInt32}(undef, sz)
 
     ch = ring.ch
 
@@ -346,14 +351,14 @@ function initialize_basis(ring::PolyRing, ngens::Int, ::Type{T}) where {T<:Coeff
 end
 
 function initialize_basis(ring::PolyRing, hashedexps, coeffs::Vector{Vector{T}}) where {T<:Coeff}
-    sz     = length(hashedexps) # hmmm
-    ndone  = 0
+    sz = length(hashedexps) # hmmm
+    ndone = 0
     ntotal = 0
-    nlead  = 0
+    nlead = 0
 
-    isred  = zeros(Int8, sz)
+    isred = zeros(Int8, sz)
     nonred = Vector{Int}(undef, sz)
-    lead   = Vector{UInt32}(undef, sz)
+    lead = Vector{UInt32}(undef, sz)
 
     ch = ring.ch
 
@@ -364,7 +369,7 @@ end
 
 function copy_basis_thorough(basis::Basis{T}) where {T}
     #  That cost a day of debugging ////
-    gens   = Vector{Vector{Int}}(undef, basis.size)
+    gens = Vector{Vector{Int}}(undef, basis.size)
     coeffs = Vector{Vector{T}}(undef, basis.size)
     @inbounds for i in 1:basis.ntotal
         gens[i] = Vector{Int}(undef, length(basis.gens[i]))
@@ -375,12 +380,12 @@ function copy_basis_thorough(basis::Basis{T}) where {T}
             coeffs[i][j] = basis.coeffs[i][j]
         end
     end
-    isred  = copy(basis.isred)
+    isred = copy(basis.isred)
     nonred = copy(basis.nonred)
     lead = copy(basis.lead)
     Basis(gens, coeffs, basis.size, basis.ndone,
-            basis.ntotal, isred, nonred, lead,
-            basis.nlead, basis.ch)
+        basis.ntotal, isred, nonred, lead,
+        basis.nlead, basis.ch)
 end
 
 #------------------------------------------------------------------------------
@@ -414,7 +419,7 @@ function normalize_basis!(basis::Basis{CoeffFF})
         @inbounds for j in 2:length(cfs[i])
             # cfs[i][j] *= mul
             # TODO: faster division
-            cfs[i][j] = cfs[i][j]*mul % ch
+            cfs[i][j] = cfs[i][j] * mul % ch
         end
         cfs[i][1] = one(cfs[i][1])
     end
@@ -505,50 +510,50 @@ end
 
 function refresh_matrix!(matrix)
     matrix.npivots = 0
-    matrix.nrows   = 0
-    matrix.ncols   = 0
-    matrix.nup     = 0
-    matrix.nlow    = 0
-    matrix.nleft   = 0
-    matrix.nright  = 0
+    matrix.nrows = 0
+    matrix.ncols = 0
+    matrix.nup = 0
+    matrix.nlow = 0
+    matrix.nleft = 0
+    matrix.nright = 0
 end
 
 function initialize_matrix(ring::PolyRing, ::Type{T}) where {T<:Coeff}
-    uprows   = Vector{Vector{Int}}(undef, 0)
-    lowrows  = Vector{Vector{Int}}(undef, 0)
+    uprows = Vector{Vector{Int}}(undef, 0)
+    lowrows = Vector{Vector{Int}}(undef, 0)
     col2hash = Vector{Int}(undef, 0)
-    coeffs   = Vector{Vector{T}}(undef, 0)
+    coeffs = Vector{Vector{T}}(undef, 0)
 
-    size    = 0
+    size = 0
     npivots = 0
-    nrows   = 0
-    ncols   = 0
+    nrows = 0
+    ncols = 0
 
-    nup    = 0
-    nlow   = 0
-    nleft  = 0
+    nup = 0
+    nlow = 0
+    nleft = 0
     nright = 0
 
-    up2coef   = Vector{Int}(undef, 0)
-    low2coef   = Vector{Int}(undef, 0)
+    up2coef = Vector{Int}(undef, 0)
+    low2coef = Vector{Int}(undef, 0)
 
     MacaulayMatrix(uprows, lowrows, col2hash, coeffs,
-            size, npivots, nrows, ncols,
-            nup, nlow, nleft, nright,
-            up2coef, low2coef)
+        size, npivots, nrows, ncols,
+        nup, nlow, nleft, nright,
+        up2coef, low2coef)
 end
 
 # TODO: change semantic
 function reinitialize_matrix!(matrix::MacaulayMatrix{T}, npairs::Int) where {T}
-    resize!(matrix.uprows, npairs*2)
-    resize!(matrix.lowrows, npairs*2)
-    resize!(matrix.up2coef, npairs*2)
-    resize!(matrix.low2coef, npairs*2)
-    matrix.size = 2*npairs
+    resize!(matrix.uprows, npairs * 2)
+    resize!(matrix.lowrows, npairs * 2)
+    resize!(matrix.up2coef, npairs * 2)
+    resize!(matrix.low2coef, npairs * 2)
+    matrix.size = 2 * npairs
     matrix.ncols = 0
     matrix.nleft = 0
     matrix.nright = 0
-    matrix.nup   = 0
-    matrix.nlow  = 0
+    matrix.nup = 0
+    matrix.nlow = 0
     matrix
 end
